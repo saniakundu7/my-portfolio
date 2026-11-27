@@ -4,31 +4,143 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Admin – Enquiries</title>
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Exo+2:ital,wght@0,500;0,700&family=Outfit:wght@400;500;600&display=swap">
 <style>
-body{margin:0;font-family:system-ui,sans-serif;background:#0c1016;color:#dde5ee;padding:24px}
-h1{color:#6cc4d4}table{width:100%;border-collapse:collapse;margin-top:16px}
-th,td{padding:10px;border:1px solid #232e3c;text-align:left}th{background:#141a22}
-tr:nth-child(even){background:#0f141c}.empty{color:#95a2b3;margin-top:20px}
+:root{--bg:#0c1016;--panel:#141a22;--line:#232e3c;--cyan:#6cc4d4;--violet:#a08ad6;--text:#dde5ee;--mute:#95a2b3}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--text);font:400 16px/1.6 Outfit,system-ui,sans-serif}
+h1,h2,h3,.logo{font-family:"Exo 2",Outfit,sans-serif;margin:0}
+.wrap{max-width:1100px;margin:0 auto;padding:0 22px}
+header{position:sticky;top:0;z-index:5;padding:12px 14px}
+nav{max-width:860px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;gap:10px;height:56px;padding:0 14px 0 20px;border:1px solid var(--line);border-radius:16px;background:rgba(16,21,28,.88);backdrop-filter:blur(12px)}
+.logo{font-weight:700;font-size:20px;white-space:nowrap}.logo b{color:var(--cyan)}
+.card{border:1px solid var(--line);border-radius:22px;background:var(--panel);padding:24px;margin-top:24px}
+input,textarea,select{background:#0b0f15;border:1px solid var(--line);color:var(--text);border-radius:12px;padding:10px 12px;font:inherit;width:100%}
+button{padding:10px 18px;border-radius:99px;font-weight:600;border:1px solid var(--line);background:var(--panel);color:var(--text);cursor:pointer}
+button.main{background:var(--cyan);color:#0b1a1f;border-color:var(--cyan)}
+button.danger{background:#3a1a1f;color:#ffb3b3;border-color:#5a2a30}
+.row{display:flex;gap:12px;flex-wrap:wrap;align-items:center}
+table{width:100%;border-collapse:collapse;margin-top:16px}
+th,td{padding:10px;border:1px solid var(--line);text-align:left;vertical-align:top}th{background:#0f141c;color:var(--cyan)}
+tr:nth-child(even){background:#0f141c}
+.empty{color:var(--mute);margin-top:20px}
+.status{color:var(--mute);margin:8px 0}
+.login{max-width:360px;margin:80px auto}
+.modal{position:fixed;inset:0;background:rgba(0,0,0,.6);display:grid;place-items:center;z-index:10}
+.modal .card{max-width:520px;width:90%}
+.hidden{display:none}
 </style>
 </head>
 <body>
-<h1>Enquiries</h1>
-<div id="status"></div>
-<table id="tbl" hidden><thead><tr><th>Name</th><th>Email</th><th>Service</th><th>Message</th><th>Date</th></tr></thead><tbody></tbody></table>
+<header><nav><div class="logo">Admin <b>·</b> Enquiries</div><div id="authInfo"></div></nav></header>
+<main class="wrap">
+  <div id="loginBox" class="card login">
+    <h2 style="color:var(--cyan);margin-bottom:14px">Login</h2>
+    <input id="email" type="email" placeholder="Email"><br><br>
+    <input id="password" type="password" placeholder="Password"><br><br>
+    <button class="main" id="loginBtn">Sign in</button>
+    <p class="status" id="loginStatus"></p>
+  </div>
+  <div id="appBox" class="hidden">
+    <div class="card">
+      <div class="row">
+        <input id="search" placeholder="Search name/email/service/message" style="flex:1;min-width:200px">
+        <select id="serviceFilter" style="width:180px"><option value="">All services</option></select>
+        <button id="refreshBtn">Refresh</button>
+        <button id="logoutBtn">Logout</button>
+      </div>
+      <p class="status" id="status"></p>
+      <table id="tbl" hidden><thead><tr><th>Name</th><th>Email</th><th>Service</th><th>Message</th><th>Date</th><th>Actions</th></tr></thead><tbody></tbody></table>
+      <p class="empty" id="empty"></p>
+    </div>
+  </div>
+</main>
+<div id="editModal" class="modal hidden">
+  <div class="card">
+    <h3 style="color:var(--cyan);margin-bottom:12px">Edit enquiry</h3>
+    <input id="eName" placeholder="Name"><br><br>
+    <input id="eEmail" placeholder="Email"><br><br>
+    <input id="eService" placeholder="Service"><br><br>
+    <textarea id="eMessage" rows="4" placeholder="Message"></textarea><br><br>
+    <div class="row"><button class="main" id="saveEdit">Save</button><button id="cancelEdit">Cancel</button></div>
+  </div>
+</div>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
 var SUPABASE_URL="https://rjmkuescftmslqchvrbx.supabase.co",SUPABASE_ANON_KEY="sb_publishable_CfC4B-dBj3KFzCpR4BHhXA_6ZPyZBkI";
 var sb=window.supabase.createClient(SUPABASE_URL,SUPABASE_ANON_KEY);
-var st=document.getElementById("status"),tbl=document.getElementById("tbl"),tb=tbl.querySelector("tbody");
-sb.from("enquiries").select("*").order("created_at",{ascending:false}).then(function(r){
-  if(r.error){st.textContent="Error: "+r.error.message;return}
-  if(!r.data||!r.data.length){st.textContent="No enquiries yet.";return}
-  st.textContent=r.data.length+" enquiry(s)";tbl.hidden=false;
-  r.data.forEach(function(e){var tr=document.createElement("tr");
-    tr.innerHTML="<td>"+(e.name||"")+"</td><td>"+(e.email||"")+"</td><td>"+(e.service||"")+"</td><td>"+(e.message||"")+"</td><td>"+(e.created_at?new Date(e.created_at).toLocaleString():"")+"</td>";
-    tb.appendChild(tr)});
-});
+var all=[],editing=null;
+function show(id){document.getElementById(id).classList.remove("hidden")}
+function hide(id){document.getElementById(id).classList.add("hidden")}
+async function checkAuth(){
+  const {data:{session}}=await sb.auth.getSession();
+  if(session){hide("loginBox");show("appBox");load();}else{show("loginBox");hide("appBox");}
+}
+document.getElementById("loginBtn").onclick=async()=>{
+  const email=document.getElementById("email").value,password=document.getElementById("password").value;
+  const {error}=await sb.auth.signInWithPassword({email,password});
+  document.getElementById("loginStatus").textContent=error?error.message:"Signed in";
+  if(!error) checkAuth();
+};
+document.getElementById("logoutBtn").onclick=async()=>{await sb.auth.signOut();checkAuth();};
+async function load(){
+  const {data,error}=await sb.from("enquiries").select("*").order("created_at",{ascending:false});
+  const st=document.getElementById("status"),tbl=document.getElementById("tbl"),tb=tbl.querySelector("tbody"),empty=document.getElementById("empty");
+  if(error){st.textContent="Error: "+error.message;return;}
+  all=data||[];
+  // service filter options
+  const sel=document.getElementById("serviceFilter");
+  const services=[...new Set(all.map(e=>e.service).filter(Boolean))];
+  sel.innerHTML='<option value="">All services</option>'+services.map(s=>`<option value="${s}">${s}</option>`).join("");
+  render();
+}
+function render(){
+  const q=document.getElementById("search").value.toLowerCase();
+  const svc=document.getElementById("serviceFilter").value;
+  const filtered=all.filter(e=>{
+    if(svc && e.service!==svc) return false;
+    const hay=[e.name,e.email,e.service,e.message].join(" ").toLowerCase();
+    return !q || hay.includes(q);
+  });
+  const tbl=document.getElementById("tbl"),tb=tbl.querySelector("tbody"),empty=document.getElementById("empty"),st=document.getElementById("status");
+  tb.innerHTML="";
+  if(!filtered.length){tbl.hidden=true;empty.textContent="No enquiries.";st.textContent="0 result(s)";return;}
+  tbl.hidden=false;empty.textContent="";st.textContent=filtered.length+" enquiry(s)";
+  filtered.forEach(e=>{
+    const tr=document.createElement("tr");
+    tr.innerHTML=`<td>${e.name||""}</td><td>${e.email||""}</td><td>${e.service||""}</td><td>${e.message||""}</td><td>${e.created_at?new Date(e.created_at).toLocaleString():""}</td>
+      <td><button data-edit="${e.id}">Edit</button> <button class="danger" data-del="${e.id}">Delete</button></td>`;
+    tb.appendChild(tr);
+  });
+}
+document.getElementById("search").oninput=render;
+document.getElementById("serviceFilter").onchange=render;
+document.getElementById("refreshBtn").onclick=load;
+document.getElementById("tbl").onclick=async(e)=>{
+  const id=e.target.dataset.edit||e.target.dataset.del;
+  if(e.target.dataset.edit){
+    editing=all.find(x=>x.id==id);
+    document.getElementById("eName").value=editing.name||"";
+    document.getElementById("eEmail").value=editing.email||"";
+    document.getElementById("eService").value=editing.service||"";
+    document.getElementById("eMessage").value=editing.message||"";
+    show("editModal");
+  } else if(e.target.dataset.del){
+    if(!confirm("Delete this enquiry?")) return;
+    await sb.from("enquiries").delete().eq("id",id);
+    load();
+  }
+};
+document.getElementById("saveEdit").onclick=async()=>{
+  await sb.from("enquiries").update({
+    name:document.getElementById("eName").value,
+    email:document.getElementById("eEmail").value,
+    service:document.getElementById("eService").value,
+    message:document.getElementById("eMessage").value
+  }).eq("id",editing.id);
+  hide("editModal");load();
+};
+document.getElementById("cancelEdit").onclick=()=>hide("editModal");
+checkAuth();
 </script>
 </body>
 </html>
