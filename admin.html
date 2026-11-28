@@ -93,7 +93,18 @@ document.getElementById("loginBtn").onclick=async()=>{
   document.getElementById("loginStatus").textContent=error?error.message:"Signed in";
   if(!error) checkAuth();
 };
-document.querySelectorAll(".tabBtn").forEach(btn=>{
+async function loadContent(section, elId){
+  const {data}=await sb.from("site_content").select("content").eq("section",section).maybeSingle();
+  if(data && data.content) document.getElementById(elId).value=data.content;
+}
+async function saveContent(section, elId, statusId){
+  const val=document.getElementById(elId).value;
+  const {error}=await sb.from("site_content").upsert({section,content:val,updated_at:new Date().toISOString()});
+  document.getElementById(statusId).textContent=error?error.message:"Saved";
+}
+// load on auth
+const _origCheckAuth=checkAuth;
+checkAuth=async()=>{await _origCheckAuth(); if((await sb.auth.getSession()).data.session){["hero","about","education","tools","projects"].forEach(s=>loadContent(s,s+"Text"));}};
   btn.onclick=()=>{
     document.querySelectorAll(".tabBtn").forEach(b=>b.classList.remove("active"));
     btn.classList.add("active");
@@ -161,6 +172,11 @@ document.getElementById("saveEdit").onclick=async()=>{
 };
 document.getElementById("cancelEdit").onclick=()=>hide("editModal");
 checkAuth();
+document.getElementById("saveHero").onclick=()=>saveContent("hero","heroText","heroStatus");
+document.getElementById("saveAbout").onclick=()=>saveContent("about","aboutText","aboutStatus");
+document.getElementById("saveEdu").onclick=()=>saveContent("education","eduText","eduStatus");
+document.getElementById("saveTools").onclick=()=>saveContent("tools","toolsText","toolsStatus");
+document.getElementById("saveProj").onclick=()=>saveContent("projects","projText","projStatus");
 </script>
 </body>
 </html>
