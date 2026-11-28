@@ -19,4 +19,16 @@ Enquiries from the website contact form are stored in the `enquiries` table. The
 
 ## Deploy
 
-GitHub Pages: Settings → Pages → Deploy from a branch → `main` → `/ (root)`.
+### Vercel (frontend)
+
+1. Go to `vercel.com/new` and import the `saniakundu7/my-portfolio` repository.
+2. Framework Preset: **Other**. Build Command: leave empty. Output Directory: `.`
+3. Deploy. The site opens at `https://<project>.vercel.app` and the admin at `/admin.html`.
+
+### Backend
+
+Supabase is the backend (auth, database and enquiries), so no separate server is required. If a custom API is needed later, it can be added as a separate Render service.
+
+### GitHub Pages
+
+Settings → Pages → Deploy from a branch → `main` → `/ (root)`.
