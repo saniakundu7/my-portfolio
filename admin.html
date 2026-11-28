@@ -57,6 +57,7 @@ button.tiny{padding:6px 12px;font-size:13px}
 .itemCard .itemTop{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:12px}
 .itemCard h4{margin:0;font:600 16px Outfit,sans-serif;color:var(--cyan)}
 .grid2{display:grid;grid-template-columns:1fr 1fr;gap:0 14px}
+.imgPreview{display:block;max-width:100%;max-height:190px;border-radius:10px;border:1px solid var(--line);margin-top:8px;object-fit:cover}
 .stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:14px;margin-bottom:20px}
 .stat{border:1px solid var(--line);border-radius:16px;background:var(--panel);padding:18px}
 .stat span{display:block;color:var(--mute);font-size:13px;text-transform:uppercase;letter-spacing:.05em}
@@ -271,8 +272,8 @@ var DEFAULTS={
   journey:[{year:"2022",text:"Completed 10th grade (CBSE) at Balvikas Global School."},{year:"2024",text:"Completed 12th grade (CBSE) at Balvikas Global School."},{year:"2025-26",text:"Completed O Level."},{year:"Now",text:"Learning digital marketing with AI and exploring 50+ AI tools."},{year:"Building",text:"The Disha Institute website and the puzzle game Brain Buzz."}]},
  skills:{items:["Digital marketing with AI","HTML & CSS","JavaScript","Google AI Studio","AI prompting","OpenAI GPT","Claude AI","Deepgram","Vercel","Render","VS Code","Git & GitHub"]},
  projects:{items:[
-  {tag:"Project 01",title:"Disha Institute, Kaithal",desc:"A website for Disha Institute, a coaching institute in Kaithal for NEET, JEE, NDA, Sainik School, Olympiad and School Foundation.",points:["DSAT Scholarship and admissions section","Courses, gallery and contact pages","AI Assistant, plus WhatsApp and call buttons for enquiries"],link:"https://disha-institute.vercel.app/",code:""},
-  {tag:"Project 02",title:"Brain Buzz",desc:"A puzzle game with hand-drawn brain teasers, built in Google AI Studio.",points:["200 adventure puzzles on a levels map","Daily puzzle with free coins, streak and badges","Detective ranks and easy keyboard shortcuts"],link:"https://brain-buzz-1.ai.studio/",code:"https://github.com/saniakundu7/Brain-buzz"}
+  {tag:"Project 01",title:"Disha Institute, Kaithal",desc:"A website for Disha Institute, a coaching institute in Kaithal for NEET, JEE, NDA, Sainik School, Olympiad and School Foundation.",points:["DSAT Scholarship and admissions section","Courses, gallery and contact pages","AI Assistant, plus WhatsApp and call buttons for enquiries"],link:"https://disha-institute.vercel.app/",code:"",image:""},
+  {tag:"Project 02",title:"Brain Buzz",desc:"A puzzle game with hand-drawn brain teasers, built in Google AI Studio.",points:["200 adventure puzzles on a levels map","Daily puzzle with free coins, streak and badges","Detective ranks and easy keyboard shortcuts"],link:"https://brain-buzz-1.ai.studio/",code:"https://github.com/saniakundu7/Brain-buzz",image:""}
  ]},
  services:{items:[{title:"AI digital marketing",desc:"Post ideas, captions and promotion plans for local businesses, made with AI."},{title:"Websites",desc:"Clean, mobile-friendly sites for businesses and institutes."},{title:"Games & mini apps",desc:"Simple, fun apps that work well on phones."}]},
  contact:{email:"saniakundu7@gmail.com",github:"https://github.com/saniakundu7"}
@@ -303,7 +304,7 @@ function addJourneyRow(year,text){var box=$("journeyRows"),row=document.createEl
 function collectJourney(){var out=[];[].forEach.call(document.querySelectorAll("#journeyRows .repeatRow"),function(row){var y=row.querySelector(".jYear").value.trim(),t=row.querySelector(".jText").value.trim();if(y||t)out.push({year:y,text:t})});return out}
 function fillSkills(){var items=state.content.skills.items;$("skillsText").value=Array.isArray(items)?items.join("\n"):""}
 function fillProjects(){var box=$("projectRows"),items=state.content.projects.items;box.textContent="";if(!Array.isArray(items))return;items.forEach(addProjectRow)}
-function addProjectRow(p){p=p||{};var box=$("projectRows"),card=document.createElement("div");card.className="itemCard";
+function addProjectRow(p){p=p||{};var box=$("projectRows"),card=document.createElement("div");card.className="itemCard";card.dataset.image=p.image||"";
  var top=document.createElement("div");top.className="itemTop";var h=document.createElement("h4");h.textContent=p.title||"New project";var rm=document.createElement("button");rm.type="button";rm.className="danger tiny";rm.textContent="Remove";rm.onclick=function(){card.remove()};top.appendChild(h);top.appendChild(rm);
  var g=document.createElement("div");g.className="grid2";
  g.appendChild(field("Tag","pTag",p.tag||""));
@@ -311,13 +312,46 @@ function addProjectRow(p){p=p||{};var box=$("projectRows"),card=document.createE
  card.appendChild(top);card.appendChild(g);
  card.appendChild(fieldArea("Description","pDesc",p.desc||"",2));
  card.appendChild(fieldArea("Highlights (one per line)","pPoints",(p.points||[]).join("\n"),3));
+ card.appendChild(projectImageField(card,p.image||""));
  var g2=document.createElement("div");g2.className="grid2";
  g2.appendChild(field("Live link","pLink",p.link||""));
  g2.appendChild(field("Code link","pCode",p.code||""));
  card.appendChild(g2);box.appendChild(card)}
+function projectImageField(card,image){
+ var wrap=document.createElement("label");wrap.textContent="Project screenshot";
+ var row=document.createElement("div");row.className="row";
+ var file=document.createElement("input");file.type="file";file.accept="image/*";file.className="pImageFile";file.style.maxWidth="260px";
+ var clear=document.createElement("button");clear.type="button";clear.className="tiny";clear.textContent="Use default / remove";
+ var preview=document.createElement("img");preview.className="imgPreview"+(image?"":" hidden");preview.alt="Project screenshot preview";if(image)preview.src=image;
+ var hint=document.createElement("span");hint.className="muted small";hint.textContent="Leave empty to keep the current default screenshot. Images are auto-compressed.";
+ file.onchange=function(){var f=file.files&&file.files[0];if(!f)return;if(!/^image\//.test(f.type)){toast("Choose an image file",true);return}compressImage(f,function(data){card.dataset.image=data;preview.src=data;preview.classList.remove("hidden");toast("Image ready. Save projects to apply.")})};
+ clear.onclick=function(){card.dataset.image="";preview.removeAttribute("src");preview.classList.add("hidden");file.value=""};
+ row.appendChild(file);row.appendChild(clear);wrap.appendChild(row);wrap.appendChild(preview);wrap.appendChild(hint);
+ return wrap;
+}
+function compressImage(file,done){
+ var reader=new FileReader();
+ reader.onload=function(){
+  var img=new Image();
+  img.onload=function(){
+   var max=1200,w=img.width,h=img.height;
+   if(w>max||h>max){var r=Math.min(max/w,max/h);w=Math.round(w*r);h=Math.round(h*r)}
+   var c=document.createElement("canvas");c.width=w;c.height=h;
+   var ctx=c.getContext("2d");ctx.fillStyle="#0b0f15";ctx.fillRect(0,0,w,h);ctx.drawImage(img,0,0,w,h);
+   var out=c.toDataURL("image/webp",0.78);
+   if(out.length>600000)out=c.toDataURL("image/jpeg",0.55);
+   if(out.length>900000){toast("Image is too large. Please choose a smaller image.",true);return}
+   done(out);
+  };
+  img.onerror=function(){toast("Could not read image",true)};
+  img.src=reader.result;
+ };
+ reader.onerror=function(){toast("Could not read file",true)};
+ reader.readAsDataURL(file);
+}
 function field(label,cls,val){var l=document.createElement("label");l.textContent=label;var i=document.createElement("input");i.className=cls;i.value=val;l.appendChild(i);return l}
 function fieldArea(label,cls,val,rows){var l=document.createElement("label");l.textContent=label;var t=document.createElement("textarea");t.className=cls;t.rows=rows;t.value=val;l.appendChild(t);return l}
-function collectProjects(){var out=[];[].forEach.call(document.querySelectorAll("#projectRows .itemCard"),function(card){var title=card.querySelector(".pTitle").value.trim();var tag=card.querySelector(".pTag").value.trim();var desc=card.querySelector(".pDesc").value.trim();var points=card.querySelector(".pPoints").value.split("\n").map(function(s){return s.trim()}).filter(Boolean);var link=card.querySelector(".pLink").value.trim();var code=card.querySelector(".pCode").value.trim();if(title||desc||link)out.push({tag:tag,title:title,desc:desc,points:points,link:link,code:code})});return out}
+function collectProjects(){var out=[];[].forEach.call(document.querySelectorAll("#projectRows .itemCard"),function(card){var title=card.querySelector(".pTitle").value.trim();var tag=card.querySelector(".pTag").value.trim();var desc=card.querySelector(".pDesc").value.trim();var points=card.querySelector(".pPoints").value.split("\n").map(function(s){return s.trim()}).filter(Boolean);var link=card.querySelector(".pLink").value.trim();var code=card.querySelector(".pCode").value.trim();var image=card.dataset.image||"";if(title||desc||link)out.push({tag:tag,title:title,desc:desc,points:points,link:link,code:code,image:image})});return out}
 function fillServices(){var box=$("serviceRows"),items=state.content.services.items;box.textContent="";if(!Array.isArray(items))return;items.forEach(addServiceRow)}
 function addServiceRow(s){s=s||{};var box=$("serviceRows"),card=document.createElement("div");card.className="itemCard";
  var top=document.createElement("div");top.className="itemTop";var h=document.createElement("h4");h.textContent=s.title||"New service";var rm=document.createElement("button");rm.type="button";rm.className="danger tiny";rm.textContent="Remove";rm.onclick=function(){card.remove()};top.appendChild(h);top.appendChild(rm);

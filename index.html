@@ -283,7 +283,27 @@ links.forEach(function(a){a.addEventListener("click",function(){links.forEach(fu
 </script>
 <script>
 (function(){
+ [].forEach.call(document.querySelectorAll("#hs .shot.pic img"),function(img){img.dataset.defaultSrc=img.getAttribute("src")});
  function text(id,val){if(typeof val!=="string")return;var el=document.getElementById(id);if(el)el.textContent=val}
+ function applyShot(shot,image,title){
+  if(!shot)return;
+  var img=shot.querySelector("img"),span=shot.querySelector("span");
+  if(image){
+   if(!img){img=document.createElement("img");img.alt=title||"Project screenshot";shot.appendChild(img)}
+   img.src=image;img.style.display="";
+   if(span)span.style.display="none";
+   shot.classList.add("pic");
+  }else if(img&&img.dataset.defaultSrc){
+   img.src=img.dataset.defaultSrc;img.style.display="";
+   if(span)span.style.display="none";
+   shot.classList.add("pic");
+  }else{
+   if(img)img.remove();
+   if(!span){span=document.createElement("span");span.textContent=title||"Project";shot.appendChild(span)}
+   span.style.display="";
+   shot.classList.remove("pic");
+  }
+ }
  function apply(c){
   var hero=c.hero;
   if(hero){text("heroStatus",hero.status);text("heroHeading",hero.heading);text("heroLead",hero.lead)}
@@ -330,10 +350,12 @@ links.forEach(function(a){a.addEventListener("click",function(){links.forEach(fu
      var main=el.querySelector("a.btn.main");if(main&&typeof p.link==="string"&&p.link)main.href=p.link;
      var code=el.querySelector("a.btn:not(.main)");
      if(code){if(typeof p.code==="string"&&p.code){code.href=p.code;code.style.display=""}else{code.style.display="none"}}
+     applyShot(el.querySelector(".shot"),p.image,p.title);
     }else if(hs){
      var d=document.createElement("div");d.className="proj"+(i%2?" alt":"");
      var shot=document.createElement("div");shot.className="shot";
      var sp=document.createElement("span");sp.textContent=p.title||"Project";shot.appendChild(sp);
+     applyShot(shot,p.image,p.title);
      var body=document.createElement("div");
      var pill2=document.createElement("span");pill2.className="pill";pill2.textContent=p.tag||"Project";body.appendChild(pill2);
      var h=document.createElement("h3");h.textContent=p.title||"Project";body.appendChild(h);
