@@ -145,9 +145,6 @@ function render(){
     tb.appendChild(tr);
   });
 }
-document.getElementById("search").oninput=render;
-document.getElementById("serviceFilter").onchange=render;
-document.getElementById("refreshBtn").onclick=load;
 document.getElementById("tbl").onclick=async(e)=>{
   const id=e.target.dataset.edit||e.target.dataset.del;
   if(e.target.dataset.edit){
