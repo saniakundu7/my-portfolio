@@ -3,154 +3,506 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Admin – Enquiries</title>
+<title>Sania Kundu · Admin Panel</title>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Exo+2:ital,wght@0,500;0,700&family=Outfit:wght@400;500;600&display=swap">
 <style>
-:root{--bg:#0c1016;--panel:#141a22;--line:#232e3c;--cyan:#6cc4d4;--violet:#a08ad6;--text:#dde5ee;--mute:#95a2b3}
-*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--text);font:400 16px/1.6 Outfit,system-ui,sans-serif}
-h1,h2,h3,.logo{font-family:"Exo 2",Outfit,sans-serif;margin:0}
+:root{--bg:#0c1016;--panel:#141a22;--panel2:#0f141c;--line:#232e3c;--cyan:#6cc4d4;--violet:#a08ad6;--text:#dde5ee;--mute:#95a2b3;--ok:#5fcf80;--bad:#ff8f8f}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--text);font:400 16px/1.6 Outfit,system-ui,sans-serif}
+h1,h2,h3,.logo,.brand{font-family:"Exo 2",Outfit,sans-serif;margin:0}
+a{color:var(--cyan)}
+.hidden{display:none!important}
 .wrap{display:flex;min-height:100vh}
-.sidebar{width:220px;flex-shrink:0;background:var(--panel);border-right:1px solid var(--line);padding:20px 14px;display:flex;flex-direction:column;gap:8px}
-.sideHeader{margin-bottom:16px}
-.sidebar button{display:block;width:100%;text-align:left;border-radius:12px}
-.sidebar button.active{background:var(--cyan);color:#0b1a1f;border-color:var(--cyan)}
-.main{flex:1;min-width:0;padding:24px;max-width:1100px}
-header{position:sticky;top:0;z-index:5;padding:12px 14px}
-nav{max-width:860px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;gap:10px;height:56px;padding:0 14px 0 20px;border:1px solid var(--line);border-radius:16px;background:rgba(16,21,28,.88);backdrop-filter:blur(12px)}
-.logo{font-weight:700;font-size:20px;white-space:nowrap}.logo b{color:var(--cyan)}
-.card{border:1px solid var(--line);border-radius:22px;background:var(--panel);padding:24px;margin-top:24px}
+.sidebar{width:236px;flex-shrink:0;background:var(--panel);border-right:1px solid var(--line);padding:22px 14px;display:flex;flex-direction:column;gap:10px;position:sticky;top:0;height:100vh;overflow-y:auto}
+.brand{font-weight:700;font-size:22px;margin-bottom:2px}
+.brand b{color:var(--cyan)}
+.muted{color:var(--mute)}
+.small{font-size:13px}
+.tabs{display:flex;flex-direction:column;gap:4px;margin-top:8px}
+.tabs button{display:flex;align-items:center;justify-content:space-between;gap:8px;text-align:left;width:100%;border:1px solid transparent;background:transparent;color:var(--mute);padding:10px 14px;border-radius:12px;font:inherit;font-weight:500;cursor:pointer}
+.tabs button:hover{background:var(--panel2);color:var(--text)}
+.tabs button.active{background:var(--cyan);color:#0b1a1f;border-color:var(--cyan);font-weight:600}
+.badge{min-width:22px;padding:1px 7px;border-radius:99px;background:rgba(108,196,212,.18);color:var(--cyan);font-size:12px;text-align:center}
+.tabs button.active .badge{background:rgba(11,26,31,.18);color:#0b1a1f}
+.sideFoot{margin-top:auto;display:flex;flex-direction:column;gap:8px;padding-top:16px}
+.main{flex:1;min-width:0;padding:28px;max-width:1080px}
+.panel{animation:up .3s ease both}
+@keyframes up{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+.pageHead{display:flex;align-items:flex-end;justify-content:space-between;gap:14px;flex-wrap:wrap;margin-bottom:18px}
+.pageHead h2{font-size:30px}
+.card{border:1px solid var(--line);border-radius:20px;background:var(--panel);padding:22px;margin-bottom:20px}
+label{display:grid;gap:6px;font-size:14px;color:#cdd6e2;margin-bottom:14px}
 input,textarea,select{background:#0b0f15;border:1px solid var(--line);color:var(--text);border-radius:12px;padding:10px 12px;font:inherit;width:100%}
-button{padding:10px 18px;border-radius:99px;font-weight:600;border:1px solid var(--line);background:var(--panel);color:var(--text);cursor:pointer}
+input:focus,textarea:focus,select:focus{outline:none;border-color:var(--cyan);box-shadow:0 0 0 3px rgba(108,196,212,.14)}
+textarea{resize:vertical;min-height:74px}
+button{padding:10px 18px;border-radius:99px;font:inherit;font-weight:600;border:1px solid var(--line);background:var(--panel2);color:var(--text);cursor:pointer}
+button:hover{border-color:var(--cyan)}
+button:disabled{opacity:.55;cursor:wait}
 button.main{background:var(--cyan);color:#0b1a1f;border-color:var(--cyan)}
 button.danger{background:#3a1a1f;color:#ffb3b3;border-color:#5a2a30}
-.row{display:flex;gap:12px;flex-wrap:wrap;align-items:center}
-table{width:100%;border-collapse:collapse;margin-top:16px}
-th,td{padding:10px;border:1px solid var(--line);text-align:left;vertical-align:top}th{background:#0f141c;color:var(--cyan)}
-tr:nth-child(even){background:#0f141c}
-.empty{color:var(--mute);margin-top:20px}
-.status{color:var(--mute);margin:8px 0}
-.login{max-width:360px;margin:80px auto}
-.modal{position:fixed;inset:0;background:rgba(0,0,0,.6);display:grid;place-items:center;z-index:10}
-.modal .card{max-width:520px;width:90%}
-.hidden{display:none}
+button.tiny{padding:6px 12px;font-size:13px}
+.row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.status{font-size:13px;color:var(--mute)}
+.status.err{color:var(--bad)}
+.status.ok{color:var(--ok)}
+.loginScreen{min-height:100vh;display:grid;place-items:center;padding:20px}
+.login{width:min(420px,100%);margin:0;padding:30px}
+.login h2{color:var(--cyan);margin-bottom:6px}
+.login .logo{font-size:26px;margin-bottom:6px}
+.login button.main{width:100%;margin-top:6px}
+.repeatRow{display:grid;grid-template-columns:110px 1fr auto;gap:8px;align-items:start;padding:10px;border:1px solid var(--line);border-radius:14px;background:var(--panel2);margin-bottom:10px}
+.repeatRow input,.repeatRow textarea{margin:0}
+.repeatRow textarea{grid-column:2/-1}
+.itemCard{border:1px solid var(--line);border-radius:16px;background:var(--panel2);padding:16px;margin-bottom:14px}
+.itemCard .itemTop{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:12px}
+.itemCard h4{margin:0;font:600 16px Outfit,sans-serif;color:var(--cyan)}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:0 14px}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:14px;margin-bottom:20px}
+.stat{border:1px solid var(--line);border-radius:16px;background:var(--panel);padding:18px}
+.stat span{display:block;color:var(--mute);font-size:13px;text-transform:uppercase;letter-spacing:.05em}
+.stat b{display:block;font:700 28px/1.3 "Exo 2",sans-serif;margin-top:4px;word-break:break-word}
+.stat b.small{font-size:17px}
+.secList{display:grid;gap:8px}
+.secRow{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:10px 14px;border:1px solid var(--line);border-radius:12px;background:var(--panel2);font-size:14px}
+.tagOk,.tagOff{font-size:12px;padding:2px 10px;border-radius:99px}
+.tagOk{background:rgba(95,207,128,.14);color:var(--ok)}
+.tagOff{background:rgba(149,162,179,.14);color:var(--mute)}
+table{width:100%;border-collapse:collapse;margin-top:14px;font-size:14px}
+th,td{padding:10px;border:1px solid var(--line);text-align:left;vertical-align:top}
+th{background:var(--panel2);color:var(--cyan);font-weight:600}
+tr:nth-child(even) td{background:var(--panel2)}
+.msgCell{max-width:340px;white-space:pre-wrap;word-break:break-word}
+.toolbar{display:grid;grid-template-columns:1fr 190px auto auto;gap:10px;align-items:center}
+.modal{position:fixed;inset:0;background:rgba(0,0,0,.65);display:grid;place-items:center;z-index:20;padding:18px}
+.modal .card{width:min(560px,100%);max-height:90vh;overflow:auto;margin:0}
+.toast{position:fixed;right:20px;bottom:20px;z-index:30;padding:12px 18px;border-radius:12px;background:var(--panel);border:1px solid var(--cyan);color:var(--text);box-shadow:0 12px 30px rgba(0,0,0,.4);font-size:14px}
+.toast.err{border-color:var(--bad)}
+@media(max-width:820px){
+ .wrap{flex-direction:column}
+ .sidebar{width:100%;height:auto;position:static;flex-direction:column}
+ .tabs{flex-direction:row;overflow-x:auto;padding-bottom:6px}
+ .tabs button{white-space:nowrap;width:auto}
+ .sideFoot{flex-direction:row}
+ .main{padding:18px}
+ .toolbar{grid-template-columns:1fr}
+ .grid2{grid-template-columns:1fr}
+ .repeatRow{grid-template-columns:1fr}
+ .repeatRow textarea{grid-column:auto}
+}
 </style>
 </head>
 <body>
-<header class="sideHeader"><div class="logo">Admin <b>·</b> Enquiries</div><div id="authInfo"></div></header>
-<main class="wrap">
+
+<div id="loginScreen" class="loginScreen">
+  <form id="loginForm" class="card login">
+    <div class="logo">Admin <b>·</b> Panel</div>
+    <h2>Sign in</h2>
+    <p class="muted small" style="margin:0 0 18px">Use your Supabase admin account to manage the portfolio.</p>
+    <label>Email<input id="email" type="email" required autocomplete="email" placeholder="you@example.com"></label>
+    <label>Password<input id="password" type="password" required autocomplete="current-password" placeholder="Password"></label>
+    <button class="main" id="loginBtn" type="submit">Sign in</button>
+    <p class="status" id="loginStatus" role="status"></p>
+  </form>
+</div>
+
+<div id="app" class="wrap hidden">
   <aside class="sidebar">
-    <div class="sideHeader"><div class="logo">Admin <b>·</b> Panel</div><div id="authInfo"></div></div>
-    <button class="tabBtn active" data-tab="dashboard">Dashboard</button>
-    <button class="tabBtn" data-tab="hero">Hero</button>
-    <button class="tabBtn" data-tab="about">About</button>
-    <button class="tabBtn" data-tab="education">Education</button>
-    <button class="tabBtn" data-tab="tools">Tools</button>
-    <button class="tabBtn" data-tab="projects">Projects</button>
-    <button id="logoutBtn" style="margin-top:auto">Logout</button>
+    <div class="brand">Admin <b>·</b> Panel</div>
+    <p id="authInfo" class="muted small" style="margin:0"></p>
+    <nav class="tabs">
+      <button class="tabBtn active" data-tab="dashboard">Dashboard</button>
+      <button class="tabBtn" data-tab="hero">Hero</button>
+      <button class="tabBtn" data-tab="about">About</button>
+      <button class="tabBtn" data-tab="education">Education</button>
+      <button class="tabBtn" data-tab="tools">Tools</button>
+      <button class="tabBtn" data-tab="projects">Projects</button>
+      <button class="tabBtn" data-tab="services">Services</button>
+      <button class="tabBtn" data-tab="contact">Contact</button>
+      <button class="tabBtn" data-tab="enquiries">Enquiries <span id="enqCount" class="badge">0</span></button>
+    </nav>
+    <div class="sideFoot">
+      <a class="btn" href="index.html" target="_blank" rel="noopener" style="padding:10px 18px;border:1px solid var(--line);border-radius:99px;text-align:center;font-weight:600;background:var(--panel2);color:var(--text);text-decoration:none">View site</a>
+      <button id="logoutBtn">Logout</button>
+    </div>
   </aside>
-  <section class="main">
-  <div id="loginBox" class="card login">
-    <h2 style="color:var(--cyan);margin-bottom:14px">Login</h2>
-    <input id="email" type="email" placeholder="Email"><br><br>
-    <input id="password" type="password" placeholder="Password"><br><br>
-    <button class="main" id="loginBtn">Sign in</button>
-    <p class="status" id="loginStatus"></p>
-  </div>
-  <div id="appBox" class="hidden">
-    <div id="tab-dashboard"><h3>Dashboard</h3><p class="status">Site content overview.</p></div>
-    <div id="tab-hero" class="card hidden"><h3>Hero Section</h3><textarea id="heroText" rows="6" style="width:100%"></textarea><br><br><button class="main" id="saveHero">Save</button><p class="status" id="heroStatus"></p></div>
-    <div id="tab-about" class="card hidden"><h3>About Section</h3><textarea id="aboutText" rows="6" style="width:100%"></textarea><br><br><button class="main" id="saveAbout">Save</button><p class="status" id="aboutStatus"></p></div>
-    <div id="tab-education" class="card hidden"><h3>Education</h3><textarea id="eduText" rows="6" style="width:100%"></textarea><br><br><button class="main" id="saveEdu">Save</button><p class="status" id="eduStatus"></p></div>
-    <div id="tab-tools" class="card hidden"><h3>Tools</h3><textarea id="toolsText" rows="6" style="width:100%"></textarea><br><br><button class="main" id="saveTools">Save</button><p class="status" id="toolsStatus"></p></div>
-    <div id="tab-projects" class="card hidden"><h3>Projects</h3><textarea id="projText" rows="6" style="width:100%"></textarea><br><br><button class="main" id="saveProj">Save</button><p class="status" id="projStatus"></p></div>
-  </div>
-  </section>
-</main>
+
+  <main class="main">
+    <div id="tab-dashboard" class="panel">
+      <div class="pageHead"><div><h2>Dashboard</h2><p class="muted small" style="margin:0">Portfolio content and enquiry overview.</p></div><div class="row"><button class="main" id="publishAll">Publish all sections</button><button id="dashRefresh">Refresh data</button></div></div>
+      <div class="stats">
+        <div class="stat"><span>Signed in</span><b class="small" id="dashEmail">–</b></div>
+        <div class="stat"><span>Content sections saved</span><b id="dashSections">0 / 7</b></div>
+        <div class="stat"><span>Last content update</span><b class="small" id="dashUpdated">–</b></div>
+        <div class="stat"><span>Total enquiries</span><b id="dashEnq">0</b></div>
+      </div>
+      <div class="card">
+        <h3 style="margin-bottom:6px">Site content</h3>
+        <p class="muted small" style="margin:0 0 14px">Saved sections override the default content in <code>index.html</code>.</p>
+        <div class="secList" id="dashSectionsList"></div>
+      </div>
+      <div class="card">
+        <h3 style="margin-bottom:6px">Setup checklist</h3>
+        <div class="secList">
+          <div class="secRow"><span>Supabase project connected</span><span class="tagOk" id="connTag">Checking…</span></div>
+          <div class="secRow"><span><code>site_content</code> table</span><span id="contentTag" class="tagOff">Unknown</span></div>
+          <div class="secRow"><span><code>enquiries</code> table</span><span id="enqTag" class="tagOff">Unknown</span></div>
+        </div>
+        <p class="muted small" style="margin:14px 0 0">If a table is missing, run <code>supabase-rls.sql</code> in the Supabase SQL editor.</p>
+      </div>
+    </div>
+
+    <div id="tab-hero" class="panel hidden">
+      <div class="pageHead"><div><h2>Hero section</h2><p class="muted small" style="margin:0">The first thing visitors see on the homepage.</p></div></div>
+      <div class="card">
+        <label>Availability status<input id="heroStatus" placeholder="Available for freelance projects"></label>
+        <label>Main heading<textarea id="heroHeading" rows="2" placeholder="Growing ideas with AI and digital marketing"></textarea></label>
+        <label>Intro paragraph<textarea id="heroLead" rows="3" placeholder="Tell visitors who you are"></textarea></label>
+        <div class="row"><button class="main" data-save="hero">Save hero</button><button data-reset="hero">Reset to default</button><span class="status" id="status-hero" role="status"></span></div>
+      </div>
+    </div>
+
+    <div id="tab-about" class="panel hidden">
+      <div class="pageHead"><div><h2>About section</h2><p class="muted small" style="margin:0">Your intro, story and call to action.</p></div></div>
+      <div class="card">
+        <div class="grid2">
+          <label>Highlighted title<input id="aboutHi" placeholder="Digital marketing & AI learner"></label>
+          <label>Title suffix<input id="aboutRest" placeholder="from Kaithal, Haryana"></label>
+        </div>
+        <label>Paragraph 1<textarea id="aboutP1" rows="3"></textarea></label>
+        <label>Paragraph 2<textarea id="aboutP2" rows="3"></textarea></label>
+        <label>Paragraph 3<textarea id="aboutP3" rows="3"></textarea></label>
+        <label>Call to action<textarea id="aboutCta" rows="2"></textarea></label>
+        <h3 style="margin:8px 0 12px">My story</h3>
+        <label>Story paragraph 1<textarea id="storyP1" rows="2"></textarea></label>
+        <label>Story paragraph 2<textarea id="storyP2" rows="2"></textarea></label>
+        <label>Story paragraph 3<textarea id="storyP3" rows="2"></textarea></label>
+        <div class="row"><button class="main" data-save="about">Save about</button><button data-reset="about">Reset to default</button><span class="status" id="status-about" role="status"></span></div>
+      </div>
+    </div>
+
+    <div id="tab-education" class="panel hidden">
+      <div class="pageHead"><div><h2>Education & journey</h2><p class="muted small" style="margin:0">Timeline entries shown in the About section.</p></div></div>
+      <div class="card">
+        <div id="journeyRows"></div>
+        <button id="addJourney" class="tiny" type="button">+ Add timeline entry</button>
+        <div class="row" style="margin-top:16px"><button class="main" data-save="about">Save timeline</button><button data-reset="about">Reset to default</button><span class="status" id="status-education" role="status"></span></div>
+      </div>
+    </div>
+
+    <div id="tab-tools" class="panel hidden">
+      <div class="pageHead"><div><h2>Tools & capabilities</h2><p class="muted small" style="margin:0">One tool per line. Existing icons stay with the first items.</p></div></div>
+      <div class="card">
+        <label>Capabilities<textarea id="skillsText" rows="12" placeholder="Digital marketing with AI&#10;HTML & CSS&#10;JavaScript"></textarea></label>
+        <div class="row"><button class="main" data-save="skills">Save tools</button><button data-reset="skills">Reset to default</button><span class="status" id="status-tools" role="status"></span></div>
+      </div>
+    </div>
+
+    <div id="tab-projects" class="panel hidden">
+      <div class="pageHead"><div><h2>Projects</h2><p class="muted small" style="margin:0">Project cards on the homepage. The first two keep their screenshots.</p></div></div>
+      <div class="card">
+        <div id="projectRows"></div>
+        <button id="addProject" class="tiny" type="button">+ Add project</button>
+        <div class="row" style="margin-top:16px"><button class="main" data-save="projects">Save projects</button><button data-reset="projects">Reset to default</button><span class="status" id="status-projects" role="status"></span></div>
+      </div>
+    </div>
+
+    <div id="tab-services" class="panel hidden">
+      <div class="pageHead"><div><h2>Services</h2><p class="muted small" style="margin:0">What you offer, shown as cards.</p></div></div>
+      <div class="card">
+        <div id="serviceRows"></div>
+        <button id="addService" class="tiny" type="button">+ Add service</button>
+        <div class="row" style="margin-top:16px"><button class="main" data-save="services">Save services</button><button data-reset="services">Reset to default</button><span class="status" id="status-services" role="status"></span></div>
+      </div>
+    </div>
+
+    <div id="tab-contact" class="panel hidden">
+      <div class="pageHead"><div><h2>Contact</h2><p class="muted small" style="margin:0">Links shown in the contact section and footer.</p></div></div>
+      <div class="card">
+        <label>Email address<input id="contactEmail" type="email" placeholder="you@example.com"></label>
+        <label>GitHub profile URL<input id="contactGithub" type="url" placeholder="https://github.com/username"></label>
+        <div class="row"><button class="main" data-save="contact">Save contact</button><button data-reset="contact">Reset to default</button><span class="status" id="status-contact" role="status"></span></div>
+      </div>
+    </div>
+
+    <div id="tab-enquiries" class="panel hidden">
+      <div class="pageHead"><div><h2>Enquiries</h2><p class="muted small" style="margin:0">Messages sent through the website contact form.</p></div></div>
+      <div class="card">
+        <div class="toolbar">
+          <input id="search" placeholder="Search name, email or message">
+          <select id="serviceFilter"><option value="">All services</option></select>
+          <button id="refreshBtn">Refresh</button>
+          <button id="exportBtn">Export CSV</button>
+        </div>
+        <p class="status" id="enqStatus" role="status"></p>
+        <table id="tbl" class="hidden"><thead><tr><th>Name</th><th>Email</th><th>Service</th><th>Message</th><th>Date</th><th>Actions</th></tr></thead><tbody></tbody></table>
+        <p class="status" id="empty"></p>
+      </div>
+    </div>
+  </main>
+</div>
+
 <div id="editModal" class="modal hidden">
   <div class="card">
-    <h3 style="color:var(--cyan);margin-bottom:12px">Edit enquiry</h3>
-    <input id="eName" placeholder="Name"><br><br>
-    <input id="eEmail" placeholder="Email"><br><br>
-    <input id="eService" placeholder="Service"><br><br>
-    <textarea id="eMessage" rows="4" placeholder="Message"></textarea><br><br>
+    <h3 style="color:var(--cyan);margin-bottom:14px">Edit enquiry</h3>
+    <label>Name<input id="eName"></label>
+    <label>Email<input id="eEmail" type="email"></label>
+    <label>Service<input id="eService"></label>
+    <label>Message<textarea id="eMessage" rows="4"></textarea></label>
     <div class="row"><button class="main" id="saveEdit">Save</button><button id="cancelEdit">Cancel</button></div>
   </div>
 </div>
+
+<div id="toast" class="toast hidden" role="status"></div>
+
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
 var SUPABASE_URL="https://rjmkuescftmslqchvrbx.supabase.co",SUPABASE_ANON_KEY="sb_publishable_CfC4B-dBj3KFzCpR4BHhXA_6ZPyZBkI";
 var sb=window.supabase.createClient(SUPABASE_URL,SUPABASE_ANON_KEY);
-var all=[],editing=null;
-function show(id){document.getElementById(id).classList.remove("hidden")}
-function hide(id){document.getElementById(id).classList.add("hidden")}
-async function checkAuth(){
-  const {data:{session}}=await sb.auth.getSession();
-  if(session){hide("loginBox");show("appBox");load();}else{show("loginBox");hide("appBox");}
-}
-document.getElementById("loginBtn").onclick=async()=>{
-  const email=document.getElementById("email").value,password=document.getElementById("password").value;
-  const {error}=await sb.auth.signInWithPassword({email,password});
-  document.getElementById("loginStatus").textContent=error?error.message:"Signed in";
-  if(!error) checkAuth();
+var DEFAULTS={
+ hero:{status:"Available for freelance projects & collaborations",heading:"Growing ideas with AI and digital marketing",lead:"I’m Sania Kundu from Kaithal, Haryana. I use AI tools to create marketing content, websites and games."},
+ about:{titleHighlight:"Digital marketing & AI learner",titleRest:"from Kaithal, Haryana",
+  p1:"I’m a vibe coder and a normal coder. I describe an idea to AI and shape the result, and I also write and fix code by hand.",
+  p2:"I’m learning digital marketing with AI: writing posts, captions and promotion ideas with AI tools, so the things I build can also reach people.",
+  p3:"I care about building things people in my city can really use, like a website for a coaching institute.",
+  cta:"Have an idea? Let’s build something useful together.",
+  story1:"I learn by building real projects, one problem at a time.",
+  story2:"I handle each project step by step: the idea, the design, the code and the AI tools.",
+  story3:"My goal is simple: keep learning, keep building, and make things that help people.",
+  journey:[{year:"2022",text:"Completed 10th grade (CBSE) at Balvikas Global School."},{year:"2024",text:"Completed 12th grade (CBSE) at Balvikas Global School."},{year:"2025-26",text:"Completed O Level."},{year:"Now",text:"Learning digital marketing with AI and exploring 50+ AI tools."},{year:"Building",text:"The Disha Institute website and the puzzle game Brain Buzz."}]},
+ skills:{items:["Digital marketing with AI","HTML & CSS","JavaScript","Google AI Studio","AI prompting","OpenAI GPT","Claude AI","Deepgram","Vercel","Render","VS Code","Git & GitHub"]},
+ projects:{items:[
+  {tag:"Project 01",title:"Disha Institute, Kaithal",desc:"A website for Disha Institute, a coaching institute in Kaithal for NEET, JEE, NDA, Sainik School, Olympiad and School Foundation.",points:["DSAT Scholarship and admissions section","Courses, gallery and contact pages","AI Assistant, plus WhatsApp and call buttons for enquiries"],link:"https://disha-institute.vercel.app/",code:""},
+  {tag:"Project 02",title:"Brain Buzz",desc:"A puzzle game with hand-drawn brain teasers, built in Google AI Studio.",points:["200 adventure puzzles on a levels map","Daily puzzle with free coins, streak and badges","Detective ranks and easy keyboard shortcuts"],link:"https://brain-buzz-1.ai.studio/",code:"https://github.com/saniakundu7/Brain-buzz"}
+ ]},
+ services:{items:[{title:"AI digital marketing",desc:"Post ideas, captions and promotion plans for local businesses, made with AI."},{title:"Websites",desc:"Clean, mobile-friendly sites for businesses and institutes."},{title:"Games & mini apps",desc:"Simple, fun apps that work well on phones."}]},
+ contact:{email:"saniakundu7@gmail.com",github:"https://github.com/saniakundu7"}
 };
-async function loadContent(section, elId){
-  const {data}=await sb.from("site_content").select("content").eq("section",section).maybeSingle();
-  if(data && data.content) document.getElementById(elId).value=data.content;
-}
-async function saveContent(section, elId, statusId){
-  const val=document.getElementById(elId).value;
-  const {error}=await sb.from("site_content").upsert({section,content:val,updated_at:new Date().toISOString()});
-  document.getElementById(statusId).textContent=error?error.message:"Saved";
-}
-// load on auth
-const _origCheckAuth=checkAuth;
-checkAuth=async()=>{await _origCheckAuth(); if((await sb.auth.getSession()).data.session){["hero","about","education","tools","projects"].forEach(s=>loadContent(s,s+"Text"));}};
+var SECTIONS=["hero","about","skills","projects","services","contact"];
+var SECTION_LABELS={hero:"Hero",about:"About",skills:"Tools",projects:"Projects",services:"Services",contact:"Contact"};
+var state={content:{},updated:{},enquiries:[],user:null,userId:null,enqError:"",ready:false};
+var editing=null;
+function clone(o){return JSON.parse(JSON.stringify(o))}
+function $(id){return document.getElementById(id)}
+function show(id){$(id).classList.remove("hidden")}
+function hide(id){$(id).classList.add("hidden")}
+function toast(msg,isErr){var t=$("toast");t.textContent=msg;t.className="toast"+(isErr?" err":"");t.classList.remove("hidden");clearTimeout(toast.t);toast.t=setTimeout(function(){t.classList.add("hidden")},3200)}
+function fmtDate(v){if(!v)return "–";var d=new Date(v);return isNaN(d)?"–":d.toLocaleString()}
+var STATUS_IDS={hero:"hero",about:"about",skills:"tools",projects:"projects",services:"services",contact:"contact"};
+function setStatus(name,msg,isErr){var el=$("status-"+(STATUS_IDS[name]||name));if(!el)return;el.textContent=msg;el.className="status"+(isErr?" err":" ok")}
+function merge(name,parsed){var def=clone(DEFAULTS[name]);if(!parsed||typeof parsed!=="object")return def;Object.keys(parsed).forEach(function(k){if(parsed[k]!==undefined&&parsed[k]!==null)def[k]=parsed[k]});return def}
+function escapeCsv(v){v=v==null?"":String(v);return '"'+v.replace(/"/g,'""')+'"'}
 
-document.querySelectorAll(".tabBtn").forEach(btn=>{
-  btn.onclick=()=>{
-    document.querySelectorAll(".tabBtn").forEach(b=>b.classList.remove("active"));
-    btn.classList.add("active");
-    const tab=btn.dataset.tab;
-    document.querySelectorAll("[id^='tab-']").forEach(el=>el.classList.add("hidden"));
-    document.getElementById("tab-"+tab).classList.remove("hidden");
-  };
+function fillHero(){var d=state.content.hero;$("heroStatus").value=d.status||"";$("heroHeading").value=d.heading||"";$("heroLead").value=d.lead||""}
+function fillAbout(){var d=state.content.about;$("aboutHi").value=d.titleHighlight||"";$("aboutRest").value=d.titleRest||"";$("aboutP1").value=d.p1||"";$("aboutP2").value=d.p2||"";$("aboutP3").value=d.p3||"";$("aboutCta").value=d.cta||"";$("storyP1").value=d.story1||"";$("storyP2").value=d.story2||"";$("storyP3").value=d.story3||"";fillJourney()}
+function fillJourney(){var box=$("journeyRows"),items=state.content.about.journey;box.textContent="";if(!Array.isArray(items))return;items.forEach(function(j){addJourneyRow(j.year,j.text)})}
+function addJourneyRow(year,text){var box=$("journeyRows"),row=document.createElement("div");row.className="repeatRow";
+ var y=document.createElement("input");y.className="jYear";y.placeholder="Year";y.value=year||"";
+ var t=document.createElement("input");t.className="jText";t.placeholder="What happened?";t.value=text||"";
+ var b=document.createElement("button");b.type="button";b.className="danger tiny";b.textContent="Remove";b.onclick=function(){row.remove()};
+ row.appendChild(y);row.appendChild(t);row.appendChild(b);box.appendChild(row)}
+function collectJourney(){var out=[];[].forEach.call(document.querySelectorAll("#journeyRows .repeatRow"),function(row){var y=row.querySelector(".jYear").value.trim(),t=row.querySelector(".jText").value.trim();if(y||t)out.push({year:y,text:t})});return out}
+function fillSkills(){var items=state.content.skills.items;$("skillsText").value=Array.isArray(items)?items.join("\n"):""}
+function fillProjects(){var box=$("projectRows"),items=state.content.projects.items;box.textContent="";if(!Array.isArray(items))return;items.forEach(addProjectRow)}
+function addProjectRow(p){p=p||{};var box=$("projectRows"),card=document.createElement("div");card.className="itemCard";
+ var top=document.createElement("div");top.className="itemTop";var h=document.createElement("h4");h.textContent=p.title||"New project";var rm=document.createElement("button");rm.type="button";rm.className="danger tiny";rm.textContent="Remove";rm.onclick=function(){card.remove()};top.appendChild(h);top.appendChild(rm);
+ var g=document.createElement("div");g.className="grid2";
+ g.appendChild(field("Tag","pTag",p.tag||""));
+ g.appendChild(field("Title","pTitle",p.title||""));
+ card.appendChild(top);card.appendChild(g);
+ card.appendChild(fieldArea("Description","pDesc",p.desc||"",2));
+ card.appendChild(fieldArea("Highlights (one per line)","pPoints",(p.points||[]).join("\n"),3));
+ var g2=document.createElement("div");g2.className="grid2";
+ g2.appendChild(field("Live link","pLink",p.link||""));
+ g2.appendChild(field("Code link","pCode",p.code||""));
+ card.appendChild(g2);box.appendChild(card)}
+function field(label,cls,val){var l=document.createElement("label");l.textContent=label;var i=document.createElement("input");i.className=cls;i.value=val;l.appendChild(i);return l}
+function fieldArea(label,cls,val,rows){var l=document.createElement("label");l.textContent=label;var t=document.createElement("textarea");t.className=cls;t.rows=rows;t.value=val;l.appendChild(t);return l}
+function collectProjects(){var out=[];[].forEach.call(document.querySelectorAll("#projectRows .itemCard"),function(card){var title=card.querySelector(".pTitle").value.trim();var tag=card.querySelector(".pTag").value.trim();var desc=card.querySelector(".pDesc").value.trim();var points=card.querySelector(".pPoints").value.split("\n").map(function(s){return s.trim()}).filter(Boolean);var link=card.querySelector(".pLink").value.trim();var code=card.querySelector(".pCode").value.trim();if(title||desc||link)out.push({tag:tag,title:title,desc:desc,points:points,link:link,code:code})});return out}
+function fillServices(){var box=$("serviceRows"),items=state.content.services.items;box.textContent="";if(!Array.isArray(items))return;items.forEach(addServiceRow)}
+function addServiceRow(s){s=s||{};var box=$("serviceRows"),card=document.createElement("div");card.className="itemCard";
+ var top=document.createElement("div");top.className="itemTop";var h=document.createElement("h4");h.textContent=s.title||"New service";var rm=document.createElement("button");rm.type="button";rm.className="danger tiny";rm.textContent="Remove";rm.onclick=function(){card.remove()};top.appendChild(h);top.appendChild(rm);
+ card.appendChild(top);
+ card.appendChild(field("Title","sTitle",s.title||""));
+ card.appendChild(fieldArea("Description","sDesc",s.desc||"",2));
+ box.appendChild(card)}
+function collectServices(){var out=[];[].forEach.call(document.querySelectorAll("#serviceRows .itemCard"),function(card){var title=card.querySelector(".sTitle").value.trim(),desc=card.querySelector(".sDesc").value.trim();if(title||desc)out.push({title:title,desc:desc})});return out}
+function fillContact(){var d=state.content.contact;$("contactEmail").value=d.email||"";$("contactGithub").value=d.github||""}
+
+function fillSection(name){
+ if(name==="hero")fillHero();
+ else if(name==="about")fillAbout();
+ else if(name==="skills")fillSkills();
+ else if(name==="projects")fillProjects();
+ else if(name==="services")fillServices();
+ else if(name==="contact")fillContact();
+}
+function fillForms(){SECTIONS.forEach(fillSection)}
+function collect(name){
+ if(name==="hero")return {status:$("heroStatus").value.trim(),heading:$("heroHeading").value.trim(),lead:$("heroLead").value.trim()};
+ if(name==="about")return {titleHighlight:$("aboutHi").value.trim(),titleRest:$("aboutRest").value.trim(),p1:$("aboutP1").value.trim(),p2:$("aboutP2").value.trim(),p3:$("aboutP3").value.trim(),cta:$("aboutCta").value.trim(),story1:$("storyP1").value.trim(),story2:$("storyP2").value.trim(),story3:$("storyP3").value.trim(),journey:collectJourney()};
+ if(name==="skills")return {items:$("skillsText").value.split("\n").map(function(s){return s.trim()}).filter(Boolean)};
+ if(name==="projects")return {items:collectProjects()};
+ if(name==="services")return {items:collectServices()};
+ if(name==="contact")return {email:$("contactEmail").value.trim(),github:$("contactGithub").value.trim()};
+ return null;
+}
+async function saveSection(name,btn){
+ if(!state.ready){toast("Content is still loading. Try again in a moment.",true);return}
+ var data=collect(name);if(!data)return;
+ if(btn)btn.disabled=true;
+ setStatus(name,"Saving…",false);
+ var res=await sb.from("site_content").upsert({section:name,content:JSON.stringify(data),updated_at:new Date().toISOString()});
+ if(btn)btn.disabled=false;
+ if(res.error){setStatus(name,res.error.message,true);toast("Could not save: "+res.error.message,true);return}
+ state.content[name]=data;state.updated[name]=new Date().toISOString();
+ setStatus(name,"Saved",false);
+ if(name==="about")setStatus("education","Saved",false);
+ toast(SECTION_LABELS[name]+" saved");
+ updateDashboard();
+}
+function resetSection(name){
+ if(!state.ready){toast("Content is still loading. Try again in a moment.",true);return}
+ if(!confirm("Reset "+SECTION_LABELS[name]+" to the default content?"))return;
+ state.content[name]=clone(DEFAULTS[name]);
+ fillSection(name);
+ saveSection(name);
+}
+async function loadContent(){
+ state.ready=false;
+ var res=await sb.from("site_content").select("section,content,updated_at");
+ var tag=$("contentTag");
+ if(res.error){tag.textContent="Missing";tag.className="tagOff";state.content={};SECTIONS.forEach(function(s){state.content[s]=clone(DEFAULTS[s])});fillForms();updateDashboard();state.ready=true;return}
+ tag.textContent="Ready";tag.className="tagOk";
+ state.content={};state.updated={};
+ (res.data||[]).forEach(function(row){if(!row||!row.section||!row.content)return;try{state.content[row.section]=merge(row.section,JSON.parse(row.content));state.updated[row.section]=row.updated_at}catch(e){}});
+ SECTIONS.forEach(function(s){if(!state.content[s])state.content[s]=clone(DEFAULTS[s])});
+ fillForms();updateDashboard();state.ready=true;
+}
+function updateDashboard(){
+ $("dashEmail").textContent=state.user?state.user.email:"–";
+ var saved=SECTIONS.filter(function(s){return !!state.updated[s]});
+ $("dashSections").textContent=saved.length+" / "+SECTIONS.length;
+ var latest=null;Object.keys(state.updated).forEach(function(k){var d=new Date(state.updated[k]);if(!latest||d>latest)latest=d});
+ $("dashUpdated").textContent=latest?latest.toLocaleString():"–";
+ $("dashEnq").textContent=state.enquiries.length;
+ var list=$("dashSectionsList");list.textContent="";
+ SECTIONS.forEach(function(s){var row=document.createElement("div");row.className="secRow";var n=document.createElement("span");n.textContent=SECTION_LABELS[s];var tag=document.createElement("span");var isSaved=!!state.updated[s];tag.className=isSaved?"tagOk":"tagOff";tag.textContent=isSaved?"Saved":"Default";row.appendChild(n);row.appendChild(tag);list.appendChild(row)});
+ var conn=$("connTag");conn.textContent="Connected";conn.className="tagOk";
+ $("enqTag").textContent=state.enqError?"Missing":"Ready";$("enqTag").className=state.enqError?"tagOff":"tagOk";
+}
+
+async function loadEnquiries(){
+ var res=await sb.from("enquiries").select("*").order("created_at",{ascending:false});
+ state.enqError=res.error?res.error.message:"";
+ state.enquiries=res.data||[];
+ if(res.error){$("enqStatus").textContent="Enquiries table not ready. Run supabase-rls.sql in Supabase.";$("enqStatus").className="status err"}
+ else{$("enqStatus").textContent="";$("enqStatus").className="status"}
+ var sel=$("serviceFilter"),current=sel.value;
+ sel.textContent="";var all=document.createElement("option");all.value="";all.textContent="All services";sel.appendChild(all);
+ var services=[];state.enquiries.forEach(function(e){if(e.service&&services.indexOf(e.service)<0)services.push(e.service)});
+ services.sort().forEach(function(s){var o=document.createElement("option");o.value=s;o.textContent=s;sel.appendChild(o)});
+ if(services.indexOf(current)>=0)sel.value=current;
+ renderEnquiries();updateDashboard();
+}
+function renderEnquiries(){
+ var q=($("search").value||"").toLowerCase(),svc=$("serviceFilter").value;
+ var filtered=state.enquiries.filter(function(e){
+  if(svc&&e.service!==svc)return false;
+  var hay=[e.name,e.email,e.service,e.message].join(" ").toLowerCase();
+  return !q||hay.indexOf(q)>=0;
+ });
+ var tbl=$("tbl"),tb=tbl.querySelector("tbody"),empty=$("empty");
+ tb.textContent="";
+ $("enqCount").textContent=filtered.length;
+ if(!filtered.length){tbl.classList.add("hidden");empty.textContent=state.enqError?"No enquiry table yet.":"No enquiries.";return}
+ tbl.classList.remove("hidden");empty.textContent="";
+ filtered.forEach(function(e){
+  var tr=document.createElement("tr");
+  [e.name,e.email,e.service].forEach(function(v){var td=document.createElement("td");td.textContent=v||"";tr.appendChild(td)});
+  var msg=document.createElement("td");msg.className="msgCell";msg.textContent=e.message||"";tr.appendChild(msg);
+  var dt=document.createElement("td");dt.textContent=e.created_at?new Date(e.created_at).toLocaleString():"";tr.appendChild(dt);
+  var act=document.createElement("td");
+  var ed=document.createElement("button");ed.className="tiny";ed.textContent="Edit";ed.onclick=function(){openEdit(e)};
+  var del=document.createElement("button");del.className="danger tiny";del.textContent="Delete";del.style.marginLeft="6px";del.onclick=function(){deleteEnquiry(e)};
+  act.appendChild(ed);act.appendChild(del);tr.appendChild(act);
+  tb.appendChild(tr);
+ });
+}
+function openEdit(e){editing=e;$("eName").value=e.name||"";$("eEmail").value=e.email||"";$("eService").value=e.service||"";$("eMessage").value=e.message||"";show("editModal")}
+async function deleteEnquiry(e){
+ if(!confirm("Delete this enquiry from "+(e.name||"this person")+"?"))return;
+ var res=await sb.from("enquiries").delete().eq("id",e.id);
+ if(res.error){toast(res.error.message,true);return}
+ state.enquiries=state.enquiries.filter(function(x){return x.id!==e.id});
+ renderEnquiries();updateDashboard();toast("Enquiry deleted");
+}
+async function saveEnquiry(){
+ if(!editing)return;
+ var res=await sb.from("enquiries").update({name:$("eName").value.trim(),email:$("eEmail").value.trim(),service:$("eService").value.trim(),message:$("eMessage").value.trim()}).eq("id",editing.id);
+ if(res.error){toast(res.error.message,true);return}
+ hide("editModal");loadEnquiries();toast("Enquiry updated");
+}
+function exportCsv(){
+ var rows=state.enquiries;if(!rows.length){toast("No enquiries to export",true);return}
+ var head=["Name","Email","Service","Message","Date"],lines=[head.map(escapeCsv).join(",")];
+ rows.forEach(function(e){lines.push([e.name,e.email,e.service,e.message,e.created_at?new Date(e.created_at).toLocaleString():""].map(escapeCsv).join(","))});
+ var blob=new Blob([lines.join("\n")],{type:"text/csv;charset=utf-8"}),url=URL.createObjectURL(blob),a=document.createElement("a");
+ a.href=url;a.download="enquiries.csv";document.body.appendChild(a);a.click();a.remove();URL.revokeObjectURL(url);
+}
+
+document.querySelectorAll(".tabBtn").forEach(function(btn){
+ btn.onclick=function(){
+  document.querySelectorAll(".tabBtn").forEach(function(b){b.classList.remove("active")});
+  btn.classList.add("active");
+  var tab=btn.dataset.tab;
+  document.querySelectorAll("[id^='tab-']").forEach(function(el){el.classList.add("hidden")});
+  $("tab-"+tab).classList.remove("hidden");
+  if(tab==="enquiries")loadEnquiries();
+  if(tab==="dashboard")updateDashboard();
+ };
 });
-function render(){
-  const q=document.getElementById("search").value.toLowerCase();
-  const svc=document.getElementById("serviceFilter").value;
-  const filtered=all.filter(e=>{
-    if(svc && e.service!==svc) return false;
-    const hay=[e.name,e.email,e.service,e.message].join(" ").toLowerCase();
-    return !q || hay.includes(q);
-  });
-  const tbl=document.getElementById("tbl"),tb=tbl.querySelector("tbody"),empty=document.getElementById("empty"),st=document.getElementById("status");
-  tb.innerHTML="";
-  if(!filtered.length){tbl.hidden=true;empty.textContent="No enquiries.";st.textContent="0 result(s)";return;}
-  tbl.hidden=false;empty.textContent="";st.textContent=filtered.length+" enquiry(s)";
-  filtered.forEach(e=>{
-    const tr=document.createElement("tr");
-    tr.innerHTML=`<td>${e.name||""}</td><td>${e.email||""}</td><td>${e.service||""}</td><td>${e.message||""}</td><td>${e.created_at?new Date(e.created_at).toLocaleString():""}</td>
-      <td><button data-edit="${e.id}">Edit</button> <button class="danger" data-del="${e.id}">Delete</button></td>`;
-    tb.appendChild(tr);
-  });
-}
-
-document.getElementById("saveEdit").onclick=async()=>{
-  await sb.from("enquiries").update({
-    name:document.getElementById("eName").value,
-    email:document.getElementById("eEmail").value,
-    service:document.getElementById("eService").value,
-    message:document.getElementById("eMessage").value
-  }).eq("id",editing.id);
-  hide("editModal");load();
+document.querySelectorAll("[data-save]").forEach(function(btn){btn.onclick=function(){saveSection(btn.dataset.save,btn)}});
+document.querySelectorAll("[data-reset]").forEach(function(btn){btn.onclick=function(){resetSection(btn.dataset.reset)}});
+$("addJourney").onclick=function(){addJourneyRow("","")};
+$("addProject").onclick=function(){addProjectRow({})};
+$("addService").onclick=function(){addServiceRow({})};
+$("search").oninput=renderEnquiries;
+$("serviceFilter").onchange=renderEnquiries;
+$("refreshBtn").onclick=function(){loadContent();loadEnquiries();toast("Refreshed")};
+$("dashRefresh").onclick=function(){loadContent();loadEnquiries();toast("Refreshed")};
+$("publishAll").onclick=async function(){
+ if(!confirm("Save all content sections to Supabase?"))return;
+ this.disabled=true;
+ for(var i=0;i<SECTIONS.length;i++)await saveSection(SECTIONS[i]);
+ this.disabled=false;
+ toast("All sections published");
 };
-document.getElementById("cancelEdit").onclick=()=>hide("editModal");
-checkAuth();
-document.getElementById("saveHero").onclick=()=>saveContent("hero","heroText","heroStatus");
-document.getElementById("saveAbout").onclick=()=>saveContent("about","aboutText","aboutStatus");
-document.getElementById("saveEdu").onclick=()=>saveContent("education","eduText","eduStatus");
-document.getElementById("saveTools").onclick=()=>saveContent("tools","toolsText","toolsStatus");
-document.getElementById("saveProj").onclick=()=>saveContent("projects","projText","projStatus");
+$("exportBtn").onclick=exportCsv;
+$("saveEdit").onclick=saveEnquiry;
+$("cancelEdit").onclick=function(){hide("editModal")};
+$("logoutBtn").onclick=async function(){await sb.auth.signOut();toast("Signed out")};
+
+function handleSession(session){
+ state.user=session?session.user:null;
+ if(session){
+  hide("loginScreen");show("app");
+  $("authInfo").textContent=session.user.email||"";
+  if(state.userId!==session.user.id){state.userId=session.user.id;loadContent();loadEnquiries()}
+ }else{
+  state.userId=null;state.ready=false;show("loginScreen");hide("app");
+ }
+}
+$("loginForm").onsubmit=async function(e){
+ e.preventDefault();
+ var btn=$("loginBtn"),st=$("loginStatus");
+ btn.disabled=true;st.textContent="Signing in…";st.className="status";
+ var res=await sb.auth.signInWithPassword({email:$("email").value.trim(),password:$("password").value});
+ btn.disabled=false;
+ if(res.error){st.textContent=res.error.message;st.className="status err";return}
+ st.textContent="";$("password").value="";
+};
+sb.auth.getSession().then(function(res){handleSession(res.data?res.data.session:null)});
+sb.auth.onAuthStateChange(function(_event,session){handleSession(session)});
 </script>
 </body>
 </html>

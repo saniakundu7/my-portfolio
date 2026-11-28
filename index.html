@@ -119,10 +119,10 @@ footer{border-top:1px solid var(--line);padding:22px 0;text-align:center;color:v
 <main>
 <div class="wrap hero" id="home">
 <div>
-<span class="status"><i class="dot"></i>Available for freelance projects &amp; collaborations</span>
+<span class="status"><i class="dot"></i><span id="heroStatus">Available for freelance projects &amp; collaborations</span></span>
 <p class="name" id="nm" aria-label="Sania Kundu">Sania Kundu</p>
-<h1>Growing ideas with AI and digital marketing</h1>
-<p class="lead">I’m Sania Kundu from Kaithal, Haryana. I use AI tools to create marketing content, websites and games.</p>
+<h1 id="heroHeading">Growing ideas with AI and digital marketing</h1>
+<p class="lead" id="heroLead">I’m Sania Kundu from Kaithal, Haryana. I use AI tools to create marketing content, websites and games.</p>
 <div class="btns"><a class="btn main" href="#projects">View my work</a><a class="btn" href="#contact">Let’s talk</a></div>
 </div>
 <div class="stage">
@@ -140,18 +140,18 @@ footer{border-top:1px solid var(--line);padding:22px 0;text-align:center;color:v
 <div class="head"><span class="tag">About Sania</span><h2>About <span>Me</span></h2></div>
 <div class="about">
 <div>
-<h3><span>Digital marketing &amp; AI learner</span> from Kaithal, Haryana</h3>
-<p>I’m a vibe coder and a normal coder. I describe an idea to AI and shape the result, and I also write and fix code by hand.</p>
-<p>I’m learning digital marketing with AI: writing posts, captions and promotion ideas with AI tools, so the things I build can also reach people.</p>
-<p>I care about building things people in my city can really use, like a website for a coaching institute.</p>
-<p class="cta">Have an idea? Let’s build something useful together.</p>
+<h3><span id="aboutHi">Digital marketing &amp; AI learner</span> <span id="aboutRest" style="color:inherit">from Kaithal, Haryana</span></h3>
+<p id="aboutP1">I’m a vibe coder and a normal coder. I describe an idea to AI and shape the result, and I also write and fix code by hand.</p>
+<p id="aboutP2">I’m learning digital marketing with AI: writing posts, captions and promotion ideas with AI tools, so the things I build can also reach people.</p>
+<p id="aboutP3">I care about building things people in my city can really use, like a website for a coaching institute.</p>
+<p class="cta" id="aboutCta">Have an idea? Let’s build something useful together.</p>
 </div>
 <div class="ap" id="ap">SK<em><i class="dot"></i>Kaithal, Haryana, India</em></div>
 </div>
 <div class="story"><h3>My Story</h3>
-<p>I learn by building real projects, one problem at a time.</p>
-<p>I handle each project step by step: the idea, the design, the code and the AI tools.</p>
-<p>My goal is simple: keep learning, keep building, and make things that help people.</p></div>
+<p id="storyP1">I learn by building real projects, one problem at a time.</p>
+<p id="storyP2">I handle each project step by step: the idea, the design, the code and the AI tools.</p>
+<p id="storyP3">My goal is simple: keep learning, keep building, and make things that help people.</p></div>
 <h3 class="jt">My <span style="color:var(--cyan)">Journey</span></h3>
 <div class="tl">
 <div><b>2022</b><span>Completed 10th grade (CBSE) at Balvikas Global School.</span></div>
@@ -214,7 +214,7 @@ footer{border-top:1px solid var(--line);padding:22px 0;text-align:center;color:v
 <footer>© 2026 Sania Kundu</footer>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script>,"AI Tools","Disha Institute","Brain Buzz","Vibe Coding"],h="";
+<script>var names=["Digital Marketing","AI Tools","Disha Institute","Brain Buzz","Vibe Coding"],h="";
 for(var k=0;k<2;k++)names.forEach(function(n){h+="<span>"+n+"</span><span><i>✦</i></span>"});
 document.getElementById("trk").innerHTML=h;
 document.getElementById("file").addEventListener("change",function(e){
@@ -280,6 +280,109 @@ s.addEventListener("dragstart",function(e){e.preventDefault()});
 })();
 var links=document.querySelectorAll("nav a");
 links.forEach(function(a){a.addEventListener("click",function(){links.forEach(function(x){x.classList.remove("on")});a.classList.add("on")})});
+</script>
+<script>
+(function(){
+ function text(id,val){if(typeof val!=="string")return;var el=document.getElementById(id);if(el)el.textContent=val}
+ function apply(c){
+  var hero=c.hero;
+  if(hero){text("heroStatus",hero.status);text("heroHeading",hero.heading);text("heroLead",hero.lead)}
+  var about=c.about;
+  if(about){
+   text("aboutHi",about.titleHighlight);text("aboutRest",about.titleRest);
+   text("aboutP1",about.p1);text("aboutP2",about.p2);text("aboutP3",about.p3);text("aboutCta",about.cta);
+   text("storyP1",about.story1);text("storyP2",about.story2);text("storyP3",about.story3);
+   if(Array.isArray(about.journey)){
+    var tl=document.querySelector(".tl");
+    if(tl){tl.textContent="";about.journey.forEach(function(j){
+     if(!j)return;var d=document.createElement("div"),b=document.createElement("b"),s=document.createElement("span");
+     b.textContent=j.year||"";s.textContent=j.text||"";d.appendChild(b);d.appendChild(s);tl.appendChild(d);
+    })}
+   }
+  }
+  var sk=c.skills;
+  if(sk&&Array.isArray(sk.items)){
+   var grid=document.querySelector(".grid"),caps=grid?[].slice.call(grid.querySelectorAll(".cap")):[];
+   sk.items.forEach(function(label,i){
+    if(caps[i]){
+     var cap=caps[i],icon=cap.querySelector("i");
+     while(cap.lastChild&&cap.lastChild!==icon)cap.removeChild(cap.lastChild);
+     cap.appendChild(document.createTextNode(label||""));
+    }else if(grid){
+     var d=document.createElement("div");d.className="cap";
+     var ic=document.createElement("i");ic.textContent="✦";
+     d.appendChild(ic);d.appendChild(document.createTextNode(label||""));grid.appendChild(d);
+    }
+   });
+   for(var i2=sk.items.length;i2<caps.length;i2++)caps[i2].style.display="none";
+  }
+  var pr=c.projects;
+  if(pr&&Array.isArray(pr.items)){
+   var hs=document.getElementById("hs"),cards=hs?[].slice.call(hs.querySelectorAll(".proj")):[];
+   pr.items.forEach(function(p,i){
+    if(!p)return;
+    if(cards[i]){
+     var el=cards[i],pill=el.querySelector(".pill"),h3=el.querySelector("h3"),para=el.querySelector("p"),ul=el.querySelector("ul");
+     if(pill&&typeof p.tag==="string")pill.textContent=p.tag;
+     if(h3&&typeof p.title==="string")h3.textContent=p.title;
+     if(para&&typeof p.desc==="string")para.textContent=p.desc;
+     if(ul&&Array.isArray(p.points)){ul.textContent="";p.points.forEach(function(pt){var li=document.createElement("li");li.textContent=pt;ul.appendChild(li)})}
+     var main=el.querySelector("a.btn.main");if(main&&typeof p.link==="string"&&p.link)main.href=p.link;
+     var code=el.querySelector("a.btn:not(.main)");
+     if(code){if(typeof p.code==="string"&&p.code){code.href=p.code;code.style.display=""}else{code.style.display="none"}}
+    }else if(hs){
+     var d=document.createElement("div");d.className="proj"+(i%2?" alt":"");
+     var shot=document.createElement("div");shot.className="shot";
+     var sp=document.createElement("span");sp.textContent=p.title||"Project";shot.appendChild(sp);
+     var body=document.createElement("div");
+     var pill2=document.createElement("span");pill2.className="pill";pill2.textContent=p.tag||"Project";body.appendChild(pill2);
+     var h=document.createElement("h3");h.textContent=p.title||"Project";body.appendChild(h);
+     var pp=document.createElement("p");pp.textContent=p.desc||"";body.appendChild(pp);
+     if(Array.isArray(p.points)){var ul2=document.createElement("ul");p.points.forEach(function(pt){var li=document.createElement("li");li.textContent=pt;ul2.appendChild(li)});body.appendChild(ul2)}
+     if(p.link){var a=document.createElement("a");a.className="btn main";a.href=p.link;a.target="_blank";a.rel="noopener";a.textContent="View project";body.appendChild(a)}
+     if(p.code){var a2=document.createElement("a");a2.className="btn";a2.href=p.code;a2.target="_blank";a2.rel="noopener";a2.textContent="View code";body.appendChild(a2)}
+     d.appendChild(shot);d.appendChild(body);hs.appendChild(d);
+    }
+   });
+   for(var j=pr.items.length;j<cards.length;j++)cards[j].style.display="none";
+  }
+  var sv=c.services;
+  if(sv&&Array.isArray(sv.items)){
+   var box=document.querySelector(".sv");
+   if(box){
+    box.textContent="";
+    sv.items.forEach(function(s,i){
+     if(!s)return;
+     var d=document.createElement("div");d.className="card"+(i===0?" hl":"");
+     var h=document.createElement("h3");h.textContent=s.title||"";d.appendChild(h);
+     var p=document.createElement("p");p.textContent=s.desc||"";d.appendChild(p);
+     box.appendChild(d);
+    });
+   }
+  }
+  var ct=c.contact;
+  if(ct){
+   if(typeof ct.email==="string"&&ct.email){
+    var em=document.querySelector('a[href^="mailto:"]');
+    if(em){em.href="mailto:"+ct.email;em.textContent=ct.email}
+   }
+   if(typeof ct.github==="string"&&ct.github){
+    var gh=document.querySelector('.contact a[href*="github.com"]');
+    if(gh){gh.href=ct.github;gh.textContent="GitHub: "+ct.github.replace(/\/+$/,"").split("/").pop()}
+   }
+  }
+ }
+ if(!window.sb)return;
+ window.sb.from("site_content").select("section,content").then(function(res){
+  if(res.error||!res.data)return;
+  var data={};
+  res.data.forEach(function(row){
+   if(!row||!row.section||!row.content)return;
+   try{var v=JSON.parse(row.content);if(v&&typeof v==="object")data[row.section]=v}catch(e){}
+  });
+  apply(data);
+ }).catch(function(){});
+})();
 </script>
 </body>
 </html>
