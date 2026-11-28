@@ -1,23 +1,21 @@
--- Enable Row Level Security on enquiries table
-ALTER TABLE enquiries ENABLE ROW LEVEL SECURITY;
 
--- Policy: Allow public (anon) to insert enquiries from the portfolio form
-CREATE POLICY "Allow public insert" ON enquiries
-  FOR INSERT TO anon
-  WITH CHECK (true);
+-- site_content table for editable portfolio sections
+CREATE TABLE IF NOT EXISTS site_content (
+  section text PRIMARY KEY,
+  content text,
+  updated_at timestamptz DEFAULT now()
+);
 
--- Policy: Allow authenticated users (admin) to view all enquiries
-CREATE POLICY "Allow authenticated select" ON enquiries
-  FOR SELECT TO authenticated
-  USING (true);
+ALTER TABLE site_content ENABLE ROW LEVEL SECURITY;
 
--- Policy: Allow authenticated users (admin) to update enquiries
-CREATE POLICY "Allow authenticated update" ON enquiries
-  FOR UPDATE TO authenticated
-  USING (true)
-  WITH CHECK (true);
+GRANT SELECT ON site_content TO anon;
+GRANT SELECT, INSERT, UPDATE, DELETE ON site_content TO authenticated;
 
--- Policy: Allow authenticated users (admin) to delete enquiries
-CREATE POLICY "Allow authenticated delete" ON enquiries
-  FOR DELETE TO authenticated
-  USING (true);
+DROP POLICY IF EXISTS "Public read site content" ON site_content;
+DROP POLICY IF EXISTS "Auth write site content" ON site_content;
+
+CREATE POLICY "Public read site content" ON site_content
+  FOR SELECT TO anon, authenticated USING (true);
+
+CREATE POLICY "Auth write site content" ON site_content
+  FOR ALL TO authenticated USING (true) WITH CHECK (true);

@@ -9,7 +9,12 @@
 :root{--bg:#0c1016;--panel:#141a22;--line:#232e3c;--cyan:#6cc4d4;--violet:#a08ad6;--text:#dde5ee;--mute:#95a2b3}
 *{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--text);font:400 16px/1.6 Outfit,system-ui,sans-serif}
 h1,h2,h3,.logo{font-family:"Exo 2",Outfit,sans-serif;margin:0}
-.wrap{max-width:1100px;margin:0 auto;padding:0 22px}
+.wrap{display:flex;min-height:100vh}
+.sidebar{width:220px;flex-shrink:0;background:var(--panel);border-right:1px solid var(--line);padding:20px 14px;display:flex;flex-direction:column;gap:8px}
+.sideHeader{margin-bottom:16px}
+.sidebar button{display:block;width:100%;text-align:left;border-radius:12px}
+.sidebar button.active{background:var(--cyan);color:#0b1a1f;border-color:var(--cyan)}
+.main{flex:1;min-width:0;padding:24px;max-width:1100px}
 header{position:sticky;top:0;z-index:5;padding:12px 14px}
 nav{max-width:860px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;gap:10px;height:56px;padding:0 14px 0 20px;border:1px solid var(--line);border-radius:16px;background:rgba(16,21,28,.88);backdrop-filter:blur(12px)}
 .logo{font-weight:700;font-size:20px;white-space:nowrap}.logo b{color:var(--cyan)}
@@ -31,8 +36,19 @@ tr:nth-child(even){background:#0f141c}
 </style>
 </head>
 <body>
-<header><nav><div class="logo">Admin <b>·</b> Enquiries</div><div id="authInfo"></div></nav></header>
+<header class="sideHeader"><div class="logo">Admin <b>·</b> Enquiries</div><div id="authInfo"></div></header>
 <main class="wrap">
+  <aside class="sidebar">
+    <div class="sideHeader"><div class="logo">Admin <b>·</b> Panel</div><div id="authInfo"></div></div>
+    <button class="tabBtn active" data-tab="dashboard">Dashboard</button>
+    <button class="tabBtn" data-tab="hero">Hero</button>
+    <button class="tabBtn" data-tab="about">About</button>
+    <button class="tabBtn" data-tab="education">Education</button>
+    <button class="tabBtn" data-tab="tools">Tools</button>
+    <button class="tabBtn" data-tab="projects">Projects</button>
+    <button id="logoutBtn" style="margin-top:auto">Logout</button>
+  </aside>
+  <section class="main">
   <div id="loginBox" class="card login">
     <h2 style="color:var(--cyan);margin-bottom:14px">Login</h2>
     <input id="email" type="email" placeholder="Email"><br><br>
@@ -41,18 +57,14 @@ tr:nth-child(even){background:#0f141c}
     <p class="status" id="loginStatus"></p>
   </div>
   <div id="appBox" class="hidden">
-    <div class="card">
-      <div class="row">
-        <input id="search" placeholder="Search name/email/service/message" style="flex:1;min-width:200px">
-        <select id="serviceFilter" style="width:180px"><option value="">All services</option></select>
-        <button id="refreshBtn">Refresh</button>
-        <button id="logoutBtn">Logout</button>
-      </div>
-      <p class="status" id="status"></p>
-      <table id="tbl" hidden><thead><tr><th>Name</th><th>Email</th><th>Service</th><th>Message</th><th>Date</th><th>Actions</th></tr></thead><tbody></tbody></table>
-      <p class="empty" id="empty"></p>
-    </div>
+    <div id="tab-dashboard"><h3>Dashboard</h3><p class="status">Site content overview.</p></div>
+    <div id="tab-hero" class="card hidden"><h3>Hero Section</h3><textarea id="heroText" rows="6" style="width:100%"></textarea><br><br><button class="main" id="saveHero">Save</button><p class="status" id="heroStatus"></p></div>
+    <div id="tab-about" class="card hidden"><h3>About Section</h3><textarea id="aboutText" rows="6" style="width:100%"></textarea><br><br><button class="main" id="saveAbout">Save</button><p class="status" id="aboutStatus"></p></div>
+    <div id="tab-education" class="card hidden"><h3>Education</h3><textarea id="eduText" rows="6" style="width:100%"></textarea><br><br><button class="main" id="saveEdu">Save</button><p class="status" id="eduStatus"></p></div>
+    <div id="tab-tools" class="card hidden"><h3>Tools</h3><textarea id="toolsText" rows="6" style="width:100%"></textarea><br><br><button class="main" id="saveTools">Save</button><p class="status" id="toolsStatus"></p></div>
+    <div id="tab-projects" class="card hidden"><h3>Projects</h3><textarea id="projText" rows="6" style="width:100%"></textarea><br><br><button class="main" id="saveProj">Save</button><p class="status" id="projStatus"></p></div>
   </div>
+  </section>
 </main>
 <div id="editModal" class="modal hidden">
   <div class="card">
@@ -81,7 +93,15 @@ document.getElementById("loginBtn").onclick=async()=>{
   document.getElementById("loginStatus").textContent=error?error.message:"Signed in";
   if(!error) checkAuth();
 };
-document.getElementById("logoutBtn").onclick=async()=>{await sb.auth.signOut();checkAuth();};
+document.querySelectorAll(".tabBtn").forEach(btn=>{
+  btn.onclick=()=>{
+    document.querySelectorAll(".tabBtn").forEach(b=>b.classList.remove("active"));
+    btn.classList.add("active");
+    const tab=btn.dataset.tab;
+    document.querySelectorAll("[id^='tab-']").forEach(el=>el.classList.add("hidden"));
+    document.getElementById("tab-"+tab).classList.remove("hidden");
+  };
+});
 async function load(){
   const {data,error}=await sb.from("enquiries").select("*").order("created_at",{ascending:false});
   const st=document.getElementById("status"),tbl=document.getElementById("tbl"),tb=tbl.querySelector("tbody"),empty=document.getElementById("empty");
