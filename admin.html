@@ -115,17 +115,6 @@ document.querySelectorAll(".tabBtn").forEach(btn=>{
     document.getElementById("tab-"+tab).classList.remove("hidden");
   };
 });
-async function load(){
-  const {data,error}=await sb.from("enquiries").select("*").order("created_at",{ascending:false});
-  const st=document.getElementById("status"),tbl=document.getElementById("tbl"),tb=tbl.querySelector("tbody"),empty=document.getElementById("empty");
-  if(error){st.textContent="Error: "+error.message;return;}
-  all=data||[];
-  // service filter options
-  const sel=document.getElementById("serviceFilter");
-  const services=[...new Set(all.map(e=>e.service).filter(Boolean))];
-  sel.innerHTML='<option value="">All services</option>'+services.map(s=>`<option value="${s}">${s}</option>`).join("");
-  render();
-}
 function render(){
   const q=document.getElementById("search").value.toLowerCase();
   const svc=document.getElementById("serviceFilter").value;
