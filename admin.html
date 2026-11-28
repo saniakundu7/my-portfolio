@@ -105,6 +105,8 @@ async function saveContent(section, elId, statusId){
 // load on auth
 const _origCheckAuth=checkAuth;
 checkAuth=async()=>{await _origCheckAuth(); if((await sb.auth.getSession()).data.session){["hero","about","education","tools","projects"].forEach(s=>loadContent(s,s+"Text"));}};
+
+document.querySelectorAll(".tabBtn").forEach(btn=>{
   btn.onclick=()=>{
     document.querySelectorAll(".tabBtn").forEach(b=>b.classList.remove("active"));
     btn.classList.add("active");
