@@ -145,21 +145,7 @@ function render(){
     tb.appendChild(tr);
   });
 }
-document.getElementById("tbl").onclick=async(e)=>{
-  const id=e.target.dataset.edit||e.target.dataset.del;
-  if(e.target.dataset.edit){
-    editing=all.find(x=>x.id==id);
-    document.getElementById("eName").value=editing.name||"";
-    document.getElementById("eEmail").value=editing.email||"";
-    document.getElementById("eService").value=editing.service||"";
-    document.getElementById("eMessage").value=editing.message||"";
-    show("editModal");
-  } else if(e.target.dataset.del){
-    if(!confirm("Delete this enquiry?")) return;
-    await sb.from("enquiries").delete().eq("id",id);
-    load();
-  }
-};
+
 document.getElementById("saveEdit").onclick=async()=>{
   await sb.from("enquiries").update({
     name:document.getElementById("eName").value,
